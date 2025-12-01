@@ -17,18 +17,16 @@ fun main() {
     part2(input).printlnPrefixed("part 2")
 }
 
-fun part1(input: List<Int>): Int {
-    return input
-        .windowed(2, 1)
-        .map { if (it[1] > it[0]) 1 else 0 }//.also { println(it) }
-        .sum()
-}
+fun Boolean.asBinaryValue() = if (this) 1 else 0
 
-fun part2(input: List<Int>): Int {
-    return input
+fun part1(input: List<Int>): Int =
+    input
+        .windowed(2, 1)
+        .sumOf { (a, b) -> (b > a).asBinaryValue() }
+
+fun part2(input: List<Int>): Int =
+    input
         .windowed(3, 1, partialWindows = false)
         .map { it.sum() } //.also { println(it) }
-        .windowed(2, 1)//.also { println(it) }
-        .map { if (it[1] > it[0]) 1 else 0 }//.also { println(it) }
-        .sum()
-}
+        .windowed(2, 1)
+        .sumOf { (a, b) -> (b > a).asBinaryValue() }
