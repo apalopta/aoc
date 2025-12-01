@@ -1,7 +1,7 @@
 package aoc2021.day01
 
 import utils.readInput
-import utils.println
+import utils.printlnPrefixed
 
 fun main() {
     val testInput = readInput(2021, 1, "test")
@@ -13,8 +13,8 @@ fun main() {
     val input = readInput(2021, 1, "input")
         .map { it.toInt() }
 
-    part1(input).println()
-    part2(input).println()
+    part1(input).printlnPrefixed("part 1")
+    part2(input).printlnPrefixed("part 2")
 }
 
 fun part1(input: List<Int>): Int {

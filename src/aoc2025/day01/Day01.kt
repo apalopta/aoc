@@ -1,20 +1,18 @@
 package aoc2025.day01
 
 import utils.readInput
-import utils.println
+import utils.printlnPrefixed
 
 fun main() {
-    // Test if implementation meets criteria from the description, like:
-    //check(part1(listOf("test_input")) == 1)
-
-    // Or read a large test input from the `src/aoc2025/day01/test1.txt` file:
     val testInput = readInput(2025, 1, "test")
-    check(part1(testInput) == "n/a")
 
-    // Read the input from the `src/Day01.txt` file.
+    check(part1(testInput) == "n/a")
+    //check(part2(testInput) == ...)
+
     val input = readInput(2025, 1, "input")
-    part1(input).println()
-    part2(input).println()
+
+    part1(input).printlnPrefixed("part1")
+    part2(input).printlnPrefixed("part2")
 }
 
 fun part1(input: List<String>): String {
