@@ -18,23 +18,17 @@ fun main() {
 }
 
 fun part1(input: List<Int>): Int {
-    var result = 0
-
-    input
+    return input
         .windowed(2, 1)
-        .forEach { if (it[1] > it[0]) result++ }
-
-    return result
+        .map { if (it[1] > it[0]) 1 else 0 }//.also { println(it) }
+        .sum()
 }
 
 fun part2(input: List<Int>): Int {
-    var result = 0
-
-    input
+    return input
         .windowed(3, 1, partialWindows = false)
         .map { it.sum() } //.also { println(it) }
-        .windowed(2, 1)
-        .forEach { if (it[1] > it[0]) result++ }
-
-    return result
+        .windowed(2, 1)//.also { println(it) }
+        .map { if (it[1] > it[0]) 1 else 0 }//.also { println(it) }
+        .sum()
 }

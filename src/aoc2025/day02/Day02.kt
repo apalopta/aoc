@@ -8,11 +8,11 @@ fun main() {
     //check(part1(listOf("test_input")) == 1)
 
     // Or read a large test input from the `src/aoc2025/dayxx/testx.txt` file:
-    val testInput = readInput(2025, 2, "test1")
+    val testInput = readInput(2025, 2, "test")
     check(part1(testInput) == "n/a")
 
     // Read the input from the `src/Day01.txt` file.
-    val input = readInput(2025, 2, "input1")
+    val input = readInput(2025, 2, "input")
     part1(input).println()
     part2(input).println()
 }
