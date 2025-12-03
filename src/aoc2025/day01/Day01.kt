@@ -39,8 +39,8 @@ fun part2(input: List<String>): Int {
             rotator.right(n)
         }
     }
-    println("passes: ${rotator.passes}")
-    return rotator.passes
+    println("passes: ${rotator.totalZeros}")
+    return rotator.totalZeros
 }
 
 class Rotator(val size: Int = 100, var pos: Int = 50) {
@@ -56,43 +56,31 @@ class Rotator(val size: Int = 100, var pos: Int = 50) {
 }
 
 class XRotator(val size: Int = 100, var pos: Int = 50) {
-    var passes = 0
+    var totalZeros = 0
 
-    fun right(n: Int) {
-        println("=== pos: $pos right: $n")
-        pos = (pos + n) % size
-        println("new pos:                 $pos")
+    fun right(n: Int): XRotator {
+        val p = pos
 
-        val tmpPasses = (pos + n) / size
-        val posAt0 = (if (pos == 0) 1 else 0)
-        println("tmpPasses R:                  $tmpPasses + $posAt0")
+        totalZeros += zeros(p, n)
+        pos = (p + n + size) % size
 
-        passes += (tmpPasses + posAt0)
-
+        return this
     }
 
-    fun left(n: Int) {
-        println("=== pos: $pos left: $n")
+    fun left(n: Int) : XRotator {
+        val p = (size - pos) % size
 
-//        val tmpPasses = (-pos + n) / (-size)
-        val tmpPasses = if ((pos - n) >= 0) {
-            println("---> --")
+        totalZeros += zeros(p, n)
+        //pos = (size - (p + n % size)) % size
+        pos = ((pos - n) + size) % size
+
+        return this
+    }
+
+    fun zeros(p: Int, n: Int) : Int {
+        return if ((p + n) < size)
             0
-        } else {
-            if (pos != 0) {
-                val tmp = (n - pos + size) / (size)
-                println("----> $tmp")
-                tmp
-            } else {
-                0
-            }
-        }
-
-        pos = (pos - n + size) % size
-        println("new pos:                 $pos")
-        val posAt0 = (if (pos == 0) 1 else 0)
-        println("tmpPasses L:                   $tmpPasses + $posAt0")
-
-        passes += (tmpPasses + posAt0)
+        else
+            (p + n) / size
     }
 }
