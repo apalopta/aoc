@@ -24,5 +24,8 @@ dependencies {
 tasks {
     test {
         useJUnit()
+        testLogging {
+            showStandardStreams = true
+        }
     }
 }
