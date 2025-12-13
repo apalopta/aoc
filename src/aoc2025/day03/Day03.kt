@@ -3,17 +3,18 @@ package aoc2025.day03
 import utils.readInput
 import utils.printlnPrefixed
 import java.math.BigInteger
+import kotlin.system.measureTimeMillis
 
 fun main() {
     val testInput = readInput(2025, 3, "test")
 
     check(part1(testInput) == 357)
-    check(part2(testInput) == BigInteger.valueOf(3121910778619L))
+    check(part2(testInput) == 3121910778619L)
 
     val input = readInput(2025, 3, "input")
 
     part1(input).printlnPrefixed("part 1") // 17278
-    part2(input).printlnPrefixed("part 2") // 171528556468625
+    part2(input).printlnPrefixed("part 2") // 171528556468625 -> 18ms (1000 executions)
 }
 
 fun part1(input: List<String>): Int {
@@ -31,10 +32,10 @@ fun part1(input: List<String>): Int {
     }
 }
 
-fun part2(input: List<String>): BigInteger {
+fun part2(input: List<String>): Long {
     val values = input.map { line ->
-        NumberCreator(12, line).max()
-            .let { BigInteger.valueOf(it) }
+        NumberCreator(12, line).maxOfNDigits()
+//            .let { BigInteger.valueOf(it) }
     }
     return values.sumOf { it }
 }

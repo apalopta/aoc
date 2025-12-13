@@ -1,82 +1,88 @@
 package aoc2025.day03
 
-class NumberCreator(val x: Int, val nums: String) {
-    val arr = nums.toDigits()
-    val res = Array(nums.length) { -1 }
-    val occurrences = occurrences(arr.toList())
+const val IS_DEBUG = false
 
-    fun max(): Long {
-        require(arr.size >= x) { "not enough digits in input" }
-        println(" ====  $nums")
-        var startAtIndex = 0
-        while (!res.enoughDigits(x)) {
-            startAtIndex = fillInGap(startAtIndex)
-        }
-        return res.toValue()
+fun debugPrintln(txt: String) {
+    if (IS_DEBUG) {
+        println(txt)
+    }
+}
+
+class NumberCreator(val x: Int, val nums: String) {
+    val source = nums.toDigits()
+    val result = Array(nums.length) { -1 }
+    // keep n in dedicated arrays - don't want to filter source each time
+    val occurrences = occurrences(source.toList())
+
+    fun done() = result.enoughDigits(x)
+
+    fun maxOfNDigits(): Long {
+        require(source.size >= x) { "not enough digits in input" }
+        debugPrintln(" ====  $nums")
+        fillTheGap(0, source.max())
+        return result.toValue()
     }
 
-    fun fillInGap(startIndex: Int): Int {
-        var newStart = startIndex
+    // fill the gap with x numbers starting with higher numbers
+    // fill the most right gap before adding lower numbers in front of the
+    //      (higher) number(s) before that gap
+    fun fillTheGap(startIndex: Int, startWithNumber: Int): Int {
+        var indexOfLastGap = startIndex
 
-        for (n in (9 downTo 0)) {
-            if (res.enoughDigits(x)) break
-
-            val indicesOfN = occurrences[n]
+        // startWithNumber could be always 9, but we can save time here
+        outer@for (d in (startWithNumber downTo 0)) {
+            debugPrintln("\nn: $d ")
+            val indicesOfN = occurrences[d]
                 .indicesOfValues()
-                .dropWhile { it < newStart }
+                .filter { it >= indexOfLastGap }
 
             if (indicesOfN.isEmpty()) continue
 
-            newStart = indicesOfN.first()
-
             for (i in indicesOfN.reversed()) {
-                addToResult(n, i)
-                if (res.enoughDigits(x)) break
+                addToResult(d, i)
+                if (done()) break@outer
             }
-            if (res.enoughDigits(x)) break
 
-            val indicesOfGapsAfterCurrentStart = res.indicesOfGapsAfter(newStart)
-            newStart = res.toList()
-                .dropLastWhile { it != -1 }
-                .dropLastWhile { it == -1 }.lastIndex
+            indexOfLastGap = result.indexOfLastGap()
+                .also { debugPrintln(" newStart: @index $it with number ${source.max()}") }
+            fillTheGap(indexOfLastGap, source.max())
 
-            println("       " + displayGap(newStart))
-            fillInGap(newStart)
-
-//            if (indicesOfGapsAfterCurrentStart.isEmpty()) {
-//                break
-//            }
+            if (done()) break@outer
         }
 
-        return newStart
+        return indexOfLastGap
     }
 
-    fun displayGap(newStart: Int) = res.asString().toList().mapIndexed { index, ch -> if (index == newStart) "x" else ch }.joinToString("")
-
     private fun addToResult(n: Int, i: Int) {
-        res[i] = occurrences[n][i]
-        arr[i] = -1
+        debugPrintln(" i: $i ".padEnd(7))
+        check(occurrences[n][i] == source[i]) { "ooops" }
+        result[i] = occurrences[n][i]
+        source[i] = -1
         occurrences[n][i] = -1
-        println(" res: '${res.asString()}'")
-
+        debugPrintln(" res: '${result.asString()}'")
     }
 }
 
 fun occurrences(list: List<Int>): Array<Array<Int>> {
-    val nums = Array(10) { i ->
+    return Array(10) { i ->
         Array(list.size) { j -> if (list[j] == i) i else -1 }
     }
-    nums.forEach { it.asString() }
-    return nums
 }
 
 
 fun Array<Int>.toValue() = filter { it > -1 }.joinToString("").ifEmpty { "0" }.toLong()
 fun Array<Int>.indicesOfValues() = indices.filter { this[it] != -1 }
-fun Array<Int>.indicesOfGaps() = indices.filter { this[it] == -1 }
 fun Array<Int>.enoughDigits(x: Int) = this.count { it != -1 } >= x
-fun Array<Int>.indicesOfGapsAfter(i: Int) = this.indicesOfGaps().filter { it > i }
+fun Array<Int>.displayGap(newStart: Int) = asString().toList().mapIndexed { index, ch -> if (index == newStart) "x" else ch }.joinToString("")
 
 fun String.toDigits() = toList().map { it.digitToInt() }.toTypedArray()
 
 fun Array<Int>.asString() = toList().joinToString(separator = "") { "$it".replace("-1", " ") }
+
+fun Array<Int>.indexOfLastGap(): Int {
+    return toList()
+        .dropLastWhile { it != -1 }
+        .dropLastWhile { it == -1 }
+        .lastIndex
+        .let { if (it == -1) 0 else it + 1 }
+}
