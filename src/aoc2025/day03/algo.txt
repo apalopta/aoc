@@ -1,0 +1,18 @@
+
+// fill the gap with x numbers starting with higher numbers
+// fill the most right gap before adding lower numbers in front of the
+//      (higher) number(s) before that gap
+
+==== '.............................................................232395331233653223232222152527272223222'
+     '                                                                 9                                  '
+     '                                                                 9                          7       '
+     '                                                                 9                        7 7       '
+     '                                                                 9                        7 7   3   '
+     '                                                                 9                        7 7   3  2'
+     '                                                                 9                        7 7   3 22'
+     '                                                                 9                        7 7   3222'
+     '                                                                 9                        7 7  23222'
+     '                                                                 9                        7 7 223222'
+     '                                                                 9                        7 72223222'
+     '                                                                 9                        7272223222'
+     '                                                                 9       6                7272223222'

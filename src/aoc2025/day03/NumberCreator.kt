@@ -1,8 +1,5 @@
 package aoc2025.day03
 
-// fill the gap with x numbers starting with higher numbers
-// fill the most right gap before adding lower numbers in front of the
-//      (higher) number(s) before that gap
 class NumberCreator(val lengthOfSearchedNumber: Int, nums: String) {
     val source = nums.toDigits()
     val result = Array(nums.length) { -1 }
