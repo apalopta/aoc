@@ -1,0 +1,14 @@
+- sort ranges by start
+- init tmp with first one
+- iterate over all ranges
+  - if overlap: merge tmp and current, keep range for next iteration
+  - else store tmp and use element as new tmp
+- first element merges itself
+[3..5]
+[3..5] [3..5]       -> merge ranges : 3..5
+[3..5] [10..14]     -> store range : start new 10..14
+[10..14] [12..18]   -> merge ranges : 10..18
+[10..18] [16..20]   -> merge ranges : 10..20
+- don't forget the last unstored range
+         [10..20]   -> store last range : 10..20
+- sum up (last - start + 1)

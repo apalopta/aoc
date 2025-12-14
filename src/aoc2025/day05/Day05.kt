@@ -16,12 +16,13 @@ fun main() {
         .also { it.printlnPrefixed("part 1") }
     part2(input)
         .also { check(it == 338693411431456L) }
-        .also { it.printlnPrefixed("part 2") } // merged to 88 ranges
+        .also { it.printlnPrefixed("part 2") } // merged to 88 ranges / 0.2ms
 }
 
 fun part1(input: List<String>): Int {
     val ranges = ranges(input)
-    val items = input.dropWhile { it.contains("-") }.drop(1)
+    val items = input.dropWhile { it.contains("-") }
+        .drop(1)
         .map { it.toLong() }
 
     return items.count { item -> ranges.any { it.contains(item) } }
@@ -32,27 +33,18 @@ fun part2(input: List<String>): Long {
     val sortedRanges = ranges.sortedBy { it.first }
     val newRanges = mutableListOf<LongRange>()
 
-    var myRange: LongRange = sortedRanges.first()
+    var tmpRange: LongRange = sortedRanges.first()
     sortedRanges.forEach { r ->
-        print("[$myRange] [$r]")
-        if (myRange.overlaps(r)) {
-            print(" -> merge ranges")
-            myRange += r
-            println(" : $myRange")
+        if (tmpRange.overlaps(r)) {
+            tmpRange += r
         } else {
-            print(" -> store range")
-            newRanges.add(myRange)
-            myRange = r
-            println(" : start new $myRange")
+            newRanges.add(tmpRange)
+            tmpRange = r
         }
     }
-    println(" -> store last range : $myRange")
-    newRanges.add(myRange)
-    newRanges.forEach { println(it) }
+    newRanges.add(tmpRange)
 
-    return newRanges.map { it.last - it.first + 1 }
-        .also { println("ranges: ${it.size} -> $it") }
-        .sum()  // takes too long!
+    return newRanges.sumOf { it.last - it.first + 1 }  // takes too long!
 }
 
 private fun ranges(input: List<String>): List<LongRange> {
@@ -61,13 +53,11 @@ private fun ranges(input: List<String>): List<LongRange> {
     return ranges
 }
 
-fun LongRange.overlaps(other: LongRange): Boolean {
-    return if (start <= other.first)
+fun LongRange.overlaps(other: LongRange): Boolean =
+    if (start <= other.first)
         last >= other.first
     else
         start <= other.last
-
-}
 
 operator fun LongRange.plus(other: LongRange): LongRange {
     val start = if (this.first < other.first) first else other.first
