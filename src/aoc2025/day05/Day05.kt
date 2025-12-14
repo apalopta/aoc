@@ -44,7 +44,7 @@ fun part2(input: List<String>): Long {
     }
     newRanges.add(tmpRange)
 
-    return newRanges.sumOf { it.last - it.first + 1 }  // takes too long!
+    return newRanges.sumOf { it.last - it.first + 1 }
 }
 
 private fun ranges(input: List<String>): List<LongRange> {
