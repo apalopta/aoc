@@ -16,7 +16,7 @@ fun main() {
         .also { it.printlnPrefixed("part 1") }
     part2(input)
 //        .also { check(it == ) }
-        .also { it.printlnPrefixed("part 2") } // merged to 88 ranges / 0.2ms
+        .also { it.printlnPrefixed("part 2") }
 }
 
 fun part1(input: List<String>): Long {
