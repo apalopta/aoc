@@ -17,78 +17,67 @@ fun main() {
 
     val input = readInput(2025, 4, "input")
 
-    val res1 = part1(input)
-    check(res1 == 1320)
-    res1.printlnPrefixed("part 1")
-    part2(input).printlnPrefixed("part 2")
+    part1(input)
+        .also { check(it == 1320) }
+        .also { it.printlnPrefixed("part 1") }
+    part2(input)
+        .also { check(it == 8354) }
+        .also { it.printlnPrefixed("part 2") } // ~50-60ms
 }
 
 fun part1(input: List<String>): Int {
-    val arr = Array(input.size) { x ->
-        Array(input[x].length) { y -> Point(x, y, input[x][y]) }
-    }
-
-    replaceByXForAccessible(arr)
-    val accessible = arr.toList().flatMap { it.toList() }.count { it.c == 'x' }
-
-//    println(arr.draw())
-    return accessible
-        .also { println(it) }
+    return input.toPointArray().replaceAccessibleRollsByX().size
 }
 
 fun part2(input: List<String>): Int {
-    val arr = Array(input.size) { x ->
-        Array(input[x].length) { y -> Point(x, y, input[x][y]) }
-    }
+    val arr = input.toPointArray()
     var count = 0
 
     do {
-        val list = replaceByXForAccessible(arr)
-        count += arr.toList().flatMap { it.toList() }.count { it.c == 'x' }
+        val list = arr.replaceAccessibleRollsByX()
+        count += arr.asPointList().count { it.c == 'x' }
         list.forEach { p -> arr[p.x][p.y] = p.copy(c = '.') }
     } while (list.isNotEmpty())
 
-//    println(arr.draw())
     return count
-        .also { println(it) }
 }
 
-private fun replaceByXForAccessible(
-    arr: Array<Array<Point>>
-): List<Point> {
-    return arr.toList().flatMap { it.toList() }
-        .filter { point ->
-            point.countRollsAround(arr) < 4
-        }.filter { p -> p.c == '@' }
-        .also { it.forEach { p -> arr[p.x][p.y] = p.copy(c = 'x') } }
-}
+private fun List<String>.toPointArray(): Array<Array<Point>> =
+    Array(size) { x ->
+        Array(this[x].length) { y -> Point(x, y, this[x][y]) }
+    }
 
+fun Array<Array<Point>>.asPointList() = toList().flatMap { it.toList() }
+
+private fun Array<Array<Point>>.replaceAccessibleRollsByX(): List<Point> {
+    return toList().flatMap { it.toList() }
+        .filter { point -> point.countRollsAround(this) < 4 }
+        .filter { p -> p.c == '@' }
+        .also { it.forEach { p -> this[p.x][p.y] = p.copy(c = 'x') } }
+}
 
 fun Array<Array<Point>>.draw() =
     this.joinToString(separator = "\n") { row ->
-        row.joinToString(" ") { it.c.toString() }
+        row.joinToString("") { it.c.toString() }
     }
 
-
 fun Point.countRollsAround(input: Array<Array<Point>>): Int {
-    var rolls = 0
     val minI = (x - 1).coerceAtLeast(0)
     val maxI = (x + 1).coerceAtMost(input.lastIndex)
     val minJ = (y - 1).coerceAtLeast(0)
     val maxJ = (y + 1).coerceAtMost(input[x].lastIndex)
 
-//    print("=> [${x}:${y}] (i:$minI->$maxI, j:$minJ->$maxJ) : ")
+    var result = 0
     for (i in minI..maxI) {
         for (j in minJ..maxJ) {
             val point = input[i][j]
             if ((!(point.x == this.x && point.y == this.y))
                 && (point.c == '@')
             ) {
-//                print(" @ [$i:$j]")
-                rolls++
+                result++
             }
         }
     }
-//    println(" -> $rolls")
-    return rolls
+
+    return result
 }
