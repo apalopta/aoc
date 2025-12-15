@@ -2,6 +2,8 @@ package aoc2025.day05
 
 import utils.readInput
 import utils.printlnPrefixed
+import kotlin.math.max
+import kotlin.math.min
 
 fun main() {
     val testInput = readInput(2025, 5, "test")
@@ -29,29 +31,32 @@ fun part1(input: List<String>): Int {
 }
 
 fun part2(input: List<String>): Long {
-    val ranges = ranges(input)
-    val sortedRanges = ranges.sortedBy { it.first }
-    val newRanges = mutableListOf<LongRange>()
+    return mergeRanges(ranges(input))
+        .sumOf { it.last - it.first + 1 }
+}
 
-    var tmpRange: LongRange = sortedRanges.first()
-    sortedRanges.forEach { r ->
-        if (tmpRange.overlaps(r)) {
-            tmpRange += r
+private fun mergeRanges(ranges: List<LongRange>): List<LongRange> {
+    val sortedRanges = ranges.sortedBy { it.first }
+    var range: LongRange = sortedRanges.first()
+    val mergedRanges = mutableListOf<LongRange>()
+
+    sortedRanges.forEach { otherRange ->
+        if (range.overlaps(otherRange)) {
+            range += otherRange
         } else {
-            newRanges.add(tmpRange)
-            tmpRange = r
+            mergedRanges.add(range)
+            range = otherRange
         }
     }
-    newRanges.add(tmpRange)
+        .also { mergedRanges.add(range) }
 
-    return newRanges.sumOf { it.last - it.first + 1 }
+    return mergedRanges.toList()
 }
 
-private fun ranges(input: List<String>): List<LongRange> {
-    val ranges = input.takeWhile { it.contains("-") }
-        .map { LongRange(it.substringBefore("-").toLong(), it.substringAfter("-").toLong()) }
-    return ranges
-}
+private fun ranges(input: List<String>): List<LongRange> =
+    input.takeWhile { it.contains("-") }.map {
+        LongRange(it.substringBefore("-").toLong(), it.substringAfter("-").toLong())
+    }
 
 fun LongRange.overlaps(other: LongRange): Boolean =
     if (start <= other.first)
@@ -59,8 +64,5 @@ fun LongRange.overlaps(other: LongRange): Boolean =
     else
         start <= other.last
 
-operator fun LongRange.plus(other: LongRange): LongRange {
-    val start = if (this.first < other.first) first else other.first
-    val end = if (this.last < other.last) other.last else last
-    return LongRange(start, end)
-}
+operator fun LongRange.plus(other: LongRange): LongRange =
+    LongRange(min(first, other.first), max(last, other.last))
