@@ -8,7 +8,6 @@ fun main() {
 
     check(part1(testInput) == 4277556L)
     check(part2(testInput) == 3263827L)
-    println("=========")
 
     val input = readInput(2025, 6, "input")
 
@@ -21,10 +20,10 @@ fun main() {
 }
 
 fun part1(input: List<String>): Long {
-    val lines = input.map { line -> line.split(" ").filterNot(String::isEmpty) }
-    val elems = lines.transpose()
-    val res = runCalculation(elems)
-    return res.sum()
+    val linesOfNumbers = input.map { line -> line.split(" ").filterNot(String::isEmpty) }
+    val elems = linesOfNumbers.transpose()
+
+    return runCalculation(elems).sum()
 }
 
 fun List<List<String>>.transpose() =
@@ -34,67 +33,49 @@ fun List<List<String>>.transpose() =
 
 fun part2(input: List<String>): Long {
     val maxLength = input.maxOf { it.length }
-    val myInput = input.map { line -> line.padEnd(maxLength, padChar = ' ') }
+    val numberLines = input.map { line -> line.padEnd(maxLength, padChar = ' ') }
 
-    val transposed = transposeXLines(myInput, input.size - 1)
-
+    val transposedNumberBlocks = verticalTranspose(numberLines.dropLast(1))
     val operations = input.takeLast(1)[0].split(" ").filterNot(String::isEmpty)
-    val instructions = transposed.zip(operations).map { (a, b) -> a.map { it } + b }
 
-    println("instructions:")
-    instructions.forEach { println(it) }
+    val instructions = transposedNumberBlocks
+        .zip(operations)
+        .map { (a, b) -> a.map { it } + b }
 
-    val res = runCalculation(instructions)
-
-    return res.sum()
-        .also(::println)
+    return runCalculation(instructions).sum()
 }
 
-private fun transposeXLines(myInput: List<String>, size: Int): List<List<String>> {
-    val numbers = myInput.take(size).map { it.toCharArray().joinToString("") }
-    println("-> numbers")
-    println(numbers)
-    println()
-    val widthRange = (0..numbers.lastIndex)
-    val sepIndices = numbers[0].indices.filter { i ->
-        widthRange.all { numbers[it][i] == ' ' }
+private fun verticalTranspose(lines: List<String>): List<List<String>> {
+    val numberOfDigits = lines.indices
+
+    val rangesWithNumberInside = lines[0].indices.filter { i ->
+        numberOfDigits.all { lines[it][i] == ' ' } // separating column
     }.toMutableList().apply {
         addFirst(-1)
-        addLast(numbers[0].length)
-    }
-        .zipWithNext { a, b -> (a+1..b-1) }
-        .also(::println)
+        addLast(lines[0].length)
+    }.zipWithNext { a, b -> (a + 1..<b) }
 
-    val transposed = sepIndices
-        .map { range -> numbers.map { it.substring(range) } }
-        .map { it.transposeLine().map { it.joinToString("") } }
-
-    println("-> transposed:")
-    transposed.forEach { println(it) }
-//        .windowed(size, size + 1)
-//        .map { it.joinToString("") }
-//        .toList()
-//        .also { println(it) }
-//        .map { it.map { it.joinToString("").trim() } }
-    return transposed
+    return rangesWithNumberInside
+        .map { range -> lines.map { it.substring(range) } }
+        .map { lines -> lines.transposeLines().map { it.joinToString("").trim() } }
 }
 
 private fun runCalculation(instructions: List<List<String>>): List<Long> {
-    val res = instructions.map {
-        println(it)
+    return instructions.map {
         val operation = it.last()
-        val numbers = it.dropLast(1).map { n -> n.ifEmpty { "0" }.trim().toLong() }
-        val res = when (operation) {
-            "*" -> numbers.fold(1L) { acc, number -> acc * number }
-            "+" -> numbers.fold(0L) { acc, number -> acc + number }
-            else -> TODO("not implemented")
+        val numbers = it.dropLast(1)
+            .map { n -> n.toLong() }
+        when (operation) {
+            "*" -> numbers.product()
+            "+" -> numbers.sum()
+            else -> TODO("operation not implemented")
         }
-        res
     }
-    return res
 }
 
-fun List<String>.transposeLine() =
+fun List<Long>.product() = fold(1L) { acc, number -> acc * number }
+
+fun List<String>.transposeLines() =
     first().indices.map { col ->
         map { it[col] }
     }
