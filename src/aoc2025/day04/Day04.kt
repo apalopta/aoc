@@ -1,7 +1,9 @@
 package aoc2025.day04
 
+import utils.Pos
 import utils.printlnPrefixed
 import utils.readInput
+import utils.toPosArray
 
 fun main() {
     val testInput = readInput(2025, 4, "test")
@@ -38,24 +40,12 @@ fun part2(input: List<String>): Int {
     return count
 }
 
-private fun List<String>.toPosArray(): Array<Array<Pos>> =
-    Array(size) { x ->
-        Array(this[x].length) { y ->
-            Pos(x, y, this[x][y])
-        }
-    }
-
 fun Array<Array<Pos>>.asPointList() = toList().flatMap { it.toList() }
 
 private fun Array<Array<Pos>>.listAccessible(): List<Pos> =
     asPointList()
         .filter { p -> p.c == '@' }
         .filter { p -> this.nrOfAdjacentRolls(p) < 4 }
-
-fun Array<Array<Pos>>.draw() =
-    this.joinToString(separator = "\n") { row ->
-        row.joinToString("") { it.c.toString() }
-    }
 
 fun Array<Array<Pos>>.nrOfAdjacentRolls(p: Pos): Int {
     val iMin = (p.x - 1).coerceAtLeast(0)
@@ -71,22 +61,3 @@ fun Array<Array<Pos>>.nrOfAdjacentRolls(p: Pos): Int {
     }.sum()
 }
 
-data class Pos(val x: Int, val y: Int, val c: Char) {
-    override fun toString(): String {
-        return "($x, $y) $c"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is Pos)
-            (this.x == other.x && this.y == other.y)
-        else false
-    }
-
-    override fun hashCode(): Int {
-        var result = x
-        result = 31 * result + y
-        result = 31 * result + c.hashCode()
-        return result
-    }
-}
