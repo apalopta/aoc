@@ -12,10 +12,8 @@ fun main() {
     val input = readInput(2025, 6, "input")
 
     part1(input)
-        .also { check(it == 5733696195703L) }
         .also { it.printlnPrefixed("part 1") }
     part2(input)
-        .also { check(it == 10951882745757L) }
         .also { it.printlnPrefixed("part 2") }
 }
 

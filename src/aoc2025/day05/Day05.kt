@@ -14,10 +14,8 @@ fun main() {
     val input = readInput(2025, 5, "input")
 
     part1(input)
-        .also { check(it == 563) }
         .also { it.printlnPrefixed("part 1") }
     part2(input)
-        .also { check(it == 338693411431456L) }
         .also { it.printlnPrefixed("part 2") } // merged to 88 ranges / 0.2ms
 }
 

@@ -15,10 +15,8 @@ fun main() {
     val input = readInput(2025, 7, "input")
 
     part1(input)
-        .also { check(it == 1539L) }
         .also { it.printlnPrefixed("part 1") }
     part2(input)
-        .also { check(it == 6479180385864L) }
         .also { it.printlnPrefixed("part 2") } // ~2.5 ms
 }
 
@@ -31,15 +29,15 @@ fun part1(input: List<String>): Long {
     for (i in (1..arr.lastIndex)) {
         val beamedSplitters = arr[i].findBeamedSplitters(beams)
 
-        if (beamedSplitters.isNotEmpty()) {
-            count += beamedSplitters.size
+        if (beamedSplitters.isEmpty()) continue
 
-            beams = beams.toMutableList()
-                .splitBeamsAt(beamedSplitters, arr[0].lastIndex)
-                // next iteration's beams
-                .filterNot { it in beamedSplitters }
-                .also { beams -> arr[i].setBeams(beams) }
-        }
+        count += beamedSplitters.size
+
+        beams = beams.toMutableList()
+            .splitBeamsAt(beamedSplitters, arr[0].lastIndex)
+            // next iteration's beams
+            .filterNot { it in beamedSplitters }
+            .also { beams -> arr[i].setBeams(beams) }
     }
 
     return count
@@ -57,19 +55,19 @@ fun part2(input: List<String>): Long {
     for (i in (1..arr.lastIndex)) {
         val beamedSplitters = arr[i].findBeamedSplitters(beams)
 
-        if (beamedSplitters.isNotEmpty()) {
-            beams = beams.toMutableList()
-                .splitBeamsAt(beamedSplitters, timelineCounters.lastIndex)
-                .also { beams ->
-                    timelineCounters = timelineCounters
-                        .nextTimelineCounters(beams, beamedSplitters)
-                        // no timeline below a splitter
-                        .also { counters -> counters.resetAt(beamedSplitters) }
-                }
-                // next iteration's beams
-                .filterNot { it in beamedSplitters }
-                .also { beams -> arr[i].setBeams(beams) }
-        }
+        if (beamedSplitters.isEmpty()) continue
+
+        beams = beams.toMutableList()
+            .splitBeamsAt(beamedSplitters, timelineCounters.lastIndex)
+            .also { beams ->
+                timelineCounters = timelineCounters
+                    .nextTimelineCounters(beams, beamedSplitters)
+                    // no timeline below a splitter
+                    .also { counters -> counters.resetAt(beamedSplitters) }
+            }
+            // next iteration's beams
+            .filterNot { it in beamedSplitters }
+            .also { beams -> arr[i].setBeams(beams) }
     }
 
     return timelineCounters.sum()

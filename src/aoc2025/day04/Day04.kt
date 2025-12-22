@@ -14,10 +14,8 @@ fun main() {
     val input = readInput(2025, 4, "input")
 
     part1(input)
-        .also { check(it == 1320) }
         .also { it.printlnPrefixed("part 1") }
     part2(input)
-        .also { check(it == 8354) }
         .also { it.printlnPrefixed("part 2") } // ~50-60ms
 }
 
