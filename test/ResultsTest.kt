@@ -10,7 +10,7 @@ class ResultsTest {
         val input = readInput(2025, 1, "input")
 
         assertEquals(1048, aoc2025.day01.part1(input))
-//        assertEquals(, aoc2025.day01.part2(input))
+        assertEquals(6498, aoc2025.day01.part2(input))
     }
 
     @Test
