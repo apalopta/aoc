@@ -1,7 +1,6 @@
 package aoc2025.day07
 
 import utils.Pos
-import utils.draw
 import utils.printlnPrefixed
 import utils.readInput
 import utils.toPosArray
@@ -24,12 +23,11 @@ fun main() {
 fun part1(input: List<String>): Long {
     val arr = input.toPosArray()
     val range = (0..arr[0].lastIndex)
-    val start = arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")
-    var beams = listOf(start.y)
+    var beams = listOf((arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")).y)
     var count = 0L
 
-    for (i in (1..arr.lastIndex)) {
-        val beamedSplitters = arr[i].findBeamedSplitters(beams)
+    arr.forEach { row ->
+        val beamedSplitters = row.findBeamedSplitters(beams)
 
         if (beamedSplitters.isNotEmpty()) {
             count += beamedSplitters.size
@@ -38,7 +36,7 @@ fun part1(input: List<String>): Long {
                 .filterNot { it in beamedSplitters }
         }
 
-        arr[i].setBeams(beams)
+        row.setBeams(beams)
     }
 
     return count
@@ -47,18 +45,17 @@ fun part1(input: List<String>): Long {
 fun part2(input: List<String>): Long {
     val arr = input.toPosArray()
     val range = (0..arr[0].lastIndex)
-    val start = arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")
-    var beams = listOf(start.y)
+    val firstBeam = (arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")).y
+    var beams = listOf(firstBeam)
     // let's start with one timeline for the very first beam
     var timelineCounters = Array(arr[0].size) { 0L }.toMutableList().apply {
-        this[start.y] = 1
+        this[firstBeam] = 1
     }.toList()
 
-    for (i in (1..arr.lastIndex)) {
-        val beamedSplitters = arr[i].findBeamedSplitters(beams)
+    arr.forEach { row ->
+        val beamedSplitters = row.findBeamedSplitters(beams)
 
         if (beamedSplitters.isNotEmpty()) {
-
             beams = beams.toMutableList()
                 .splitBeamsAt(beamedSplitters, range)
                 .also { beams ->
@@ -71,7 +68,7 @@ fun part2(input: List<String>): Long {
                 .filterNot { it in beamedSplitters }
         }
 
-        arr[i].setBeams(beams)
+        row.setBeams(beams)
     }
 
     return timelineCounters.sum()

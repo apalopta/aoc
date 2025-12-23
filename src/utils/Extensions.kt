@@ -11,3 +11,5 @@ fun Array<Array<Pos>>.draw() =
     this.joinToString(separator = "\n") { row ->
         row.joinToString("") { it.c.toString() }
     }
+
+fun Array<Pos>.draw() = joinToString("") { "${it.c}"}
