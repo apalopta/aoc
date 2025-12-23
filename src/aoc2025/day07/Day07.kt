@@ -1,6 +1,7 @@
 package aoc2025.day07
 
 import utils.Pos
+import utils.draw
 import utils.printlnPrefixed
 import utils.readInput
 import utils.toPosArray
@@ -22,6 +23,7 @@ fun main() {
 
 fun part1(input: List<String>): Long {
     val arr = input.toPosArray()
+    val range = (0..arr[0].lastIndex)
     val start = arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")
     var beams = listOf(start.y)
     var count = 0L
@@ -29,15 +31,14 @@ fun part1(input: List<String>): Long {
     for (i in (1..arr.lastIndex)) {
         val beamedSplitters = arr[i].findBeamedSplitters(beams)
 
-        if (beamedSplitters.isEmpty()) continue
+        if (beamedSplitters.isNotEmpty()) {
+            count += beamedSplitters.size
+            beams = beams.toMutableList()
+                .splitBeamsAt(beamedSplitters, range)
+                .filterNot { it in beamedSplitters }
+        }
 
-        count += beamedSplitters.size
-
-        beams = beams.toMutableList()
-            .splitBeamsAt(beamedSplitters, arr[0].lastIndex)
-            // next iteration's beams
-            .filterNot { it in beamedSplitters }
-            .also { beams -> arr[i].setBeams(beams) }
+        arr[i].setBeams(beams)
     }
 
     return count
@@ -45,6 +46,7 @@ fun part1(input: List<String>): Long {
 
 fun part2(input: List<String>): Long {
     val arr = input.toPosArray()
+    val range = (0..arr[0].lastIndex)
     val start = arr[0].find { it.c == 'S' } ?: error("Can't find 'S' in input")
     var beams = listOf(start.y)
     // let's start with one timeline for the very first beam
@@ -55,19 +57,21 @@ fun part2(input: List<String>): Long {
     for (i in (1..arr.lastIndex)) {
         val beamedSplitters = arr[i].findBeamedSplitters(beams)
 
-        if (beamedSplitters.isEmpty()) continue
+        if (beamedSplitters.isNotEmpty()) {
 
-        beams = beams.toMutableList()
-            .splitBeamsAt(beamedSplitters, timelineCounters.lastIndex)
-            .also { beams ->
-                timelineCounters = timelineCounters
-                    .nextTimelineCounters(beams, beamedSplitters)
-                    // no timeline below a splitter
-                    .also { counters -> counters.resetAt(beamedSplitters) }
-            }
-            // next iteration's beams
-            .filterNot { it in beamedSplitters }
-            .also { beams -> arr[i].setBeams(beams) }
+            beams = beams.toMutableList()
+                .splitBeamsAt(beamedSplitters, range)
+                .also { beams ->
+                    timelineCounters = timelineCounters
+                        .nextTimelineCounters(beams, beamedSplitters)
+                        // no timeline below a splitter
+                        .also { counters -> counters.resetAt(beamedSplitters) }
+                }
+                // next iteration's beams
+                .filterNot { it in beamedSplitters }
+        }
+
+        arr[i].setBeams(beams)
     }
 
     return timelineCounters.sum()
@@ -97,7 +101,7 @@ private fun Array<Pos>.findBeamedSplitters(beams: List<Int>): List<Int> =
 
 private fun MutableList<Int>.splitBeamsAt(
     beamedSplitters: List<Int>,
-    lastPossibleBeam: Int
+    range: IntRange
 ): List<Int> =
     this.apply {
         beamedSplitters.forEach { y ->
@@ -105,7 +109,7 @@ private fun MutableList<Int>.splitBeamsAt(
             add(y + 1)
             remove(y)
         }
-    }.toSet().filter { it in 0..lastPossibleBeam }.sorted()
+    }.toSet().filter { it in range }.sorted()
 
 private fun Int.countTimelines(
     beamedSplitters: List<Int>,
